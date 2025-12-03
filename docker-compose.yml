@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  payflow-api:
+    build:
+      context: .
+      dockerfile: src/PayFlow.Api/Dockerfile
+    image: payflow-api:local
+    ports:
+      - "5000:80"
+    environment:
+      - FASTPAY_URL=http://fastpay-mock:80/fastpay/payments
+      - SECUREPAY_URL=http://securepay-mock:80/securepay/transactions
+    depends_on:
+      - fastpay-mock
+      - securepay-mock
+
+  fastpay-mock:
+    build:
+      context: .
+      dockerfile: src/FastPay.Mock/Dockerfile
+    image: fastpay-mock:local
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80
+
+  securepay-mock:
+    build:
+      context: .
+      dockerfile: src/SecurePay.Mock/Dockerfile
+    image: securepay-mock:local
+    ports:
+      - "8081:80"
+    environment:
+      - ASPNETCORE_URLS=http://+:80

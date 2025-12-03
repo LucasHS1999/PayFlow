@@ -1,0 +1,6 @@
+@FastPay.Mock_HostAddress = http://localhost:5114
+
+GET {{FastPay.Mock_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

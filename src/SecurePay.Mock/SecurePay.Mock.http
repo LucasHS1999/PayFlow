@@ -1,0 +1,6 @@
+@SecurePay.Mock_HostAddress = http://localhost:5136
+
+GET {{SecurePay.Mock_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
