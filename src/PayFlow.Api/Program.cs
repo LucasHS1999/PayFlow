@@ -1,4 +1,8 @@
 using System.Net.Http.Json;
+using PayFlow.Api.Contracts.Requests;
+using PayFlow.Api.Contracts.Responses;
+using PayFlow.Api.Domain.Interfaces;
+using PayFlow.Api.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,24 +91,3 @@ app.MapPost("/payments", async (
 app.MapGet("/", () => Results.Ok(new { status = "ok", service = "PayFlow.Api" }));
 
 await app.RunAsync();
-
-public interface IPaymentFeeService
-{
-    decimal CalculateFee(decimal amount, string currency);
-}
-
-public class PaymentFeeService : IPaymentFeeService
-{
-    public decimal CalculateFee(decimal amount, string currency)
-    {
-        // Simple fee rule: 1.5% up to 100, else 2.5%
-        var rate = amount < 100m ? 0.015m : 0.025m;
-        return decimal.Round(amount * rate, 2);
-    }
-}
-
-public record PaymentRequest(decimal amount, string currency);
-public record CanonicalResponse(string externalId, string provider, string status, decimal grossAmount, decimal fee, decimal netAmount);
-
-internal record FastPayResponse(string id, string status, string status_detail);
-internal record SecurePayResponse(string transaction_id, string result);
