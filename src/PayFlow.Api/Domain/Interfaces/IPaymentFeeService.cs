@@ -1,6 +1,7 @@
-namespace PayFlow.Api.Domain.Interfaces;
+namespace PayFlow.Api.Domain.Services;
 
 public interface IPaymentFeeService
 {
-    decimal CalculateFee(decimal amount, string currency);
+    decimal CalculateFee(decimal amount, string provider);
+    
 }

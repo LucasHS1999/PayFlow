@@ -97,7 +97,7 @@ app.MapPost("/payments", async (
         status = secondaryResult.status;
     }
 
-    var fee = feeService.CalculateFee(request.amount, request.currency);
+    var fee = feeService.CalculateFee(request.amount, providerUsed);
     var net = request.amount - fee;
 
     var canonical = new CanonicalResponse(externalId, providerUsed, status, request.amount, fee, net);

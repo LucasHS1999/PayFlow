@@ -1,6 +1,6 @@
 # PayFlow Solution
 
-Solução composta por uma API principal em Minimal API e dois serviços Mock que simulam provedores de pagamento.
+O seguinte repositório contém uma solução .NET com uma API minimalista para processamento de pagamentos, integrando-se a dois provedores simulados: FastPay e SecurePay. Visando atender as regras de negócio especificadas. Como detalharei a baixo foi incluido swagger para documentação e facilitação dos testes
 
 ## Projetos
 - `PayFlow.Api` (Minimal API)
@@ -20,24 +20,14 @@ O projeto principal lê os endpoints dos provedores via configuração:
 - `FASTPAY_URL`
 - `SECUREPAY_URL`
 
-Valores já definidos em `src/PayFlow.Api/appsettings.json` para execução local:
-- `FASTPAY_URL`: `http://localhost:5114/fastpay/payments`
-- `SECUREPAY_URL`: `http://localhost:5136/securepay/transactions`
-
-Você pode sobrescrever por variável de ambiente conforme necessário.
-
 ## Executando os projetos (sem Docker)
 - Terminal 1: `dotnet run --project src/FastPay.Mock`
 - Terminal 2: `dotnet run --project src/SecurePay.Mock`
 - Terminal 3: `dotnet run --project src/PayFlow.Api`
 
-No Visual Studio, use Multiple Startup Projects e marque os três projetos.
-
 ## Swagger e documentação
 Swagger habilitado em desenvolvimento:
 - UI: `http://localhost:5175/swagger`
-
-O endpoint principal está documentado com as regras de negócio diretamente no Swagger.
 
 ### Endpoint: POST `/payments`
 Body:
@@ -48,8 +38,9 @@ Body:
 }
 ```
 
-Regras de negócio (visíveis no Swagger):
+Regras de negócio:
 - Se `amount < 100`, o provedor utilizado é `FastPay`; caso contrário, `SecurePay`.
+- Caso o provedor principal utilizado na regra de valor não responda, a API deve tentar o outro provedor.
 - Taxas: 1.5% para valores abaixo de 100; 2.5% para valores a partir de 100.
 - URLs dos provedores são lidas de `FASTPAY_URL` e `SECUREPAY_URL`.
 
@@ -96,15 +87,17 @@ Códigos de status:
 ```
 
 ## Testes rápidos
-- Valor abaixo de 100 usa FastPay:
 ```
 curl -X POST http://localhost:5175/payments \
   -H "Content-Type: application/json" \
   -d '{"amount": 50, "currency": "BRL"}'
 ```
 
-- Valor a partir de 100 usa SecurePay:
+## Testes rápido de saúde da API
 ```
-curl -X POST http://localhost:5175/payments \
-  -H "Content-Type: application/json" \
-  -d '{"amount": 150, "currency": "BRL"}'
+curl -X GET http://localhost:5175/ 
+```
+- Retorno esperado:
+```
+{"status":"ok","service":"PayFlow.Api"}
+``` 
