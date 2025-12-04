@@ -1,7 +1,6 @@
 using System.Net.Http.Json;
 using PayFlow.Api.Contracts.Requests;
 using PayFlow.Api.Contracts.Responses;
-using PayFlow.Api.Domain.Interfaces;
 using PayFlow.Api.Domain.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +44,7 @@ app.MapPost("/payments", async (
         return Results.Problem(title: "Provider configuration missing", statusCode: StatusCodes.Status500InternalServerError);
 
     var client = httpClientFactory.CreateClient();
+    client.Timeout = TimeSpan.FromSeconds(1);
 
     async Task<(bool ok, string externalId, string status)> TryCallAsync(string providerName)
     {
@@ -52,14 +52,30 @@ app.MapPost("/payments", async (
         {
             if (providerName == "FastPay")
             {
-                var resp = await client.PostAsJsonAsync(fastPayUrl, request);
+                var fpPayload = new
+                {
+                    transaction_amount = request.amount,
+                    currency = request.currency,
+                    payer = new { email = "cliente@teste.com" },
+                    installments = 1,
+                    description = "Compra via FastPay"
+                };
+
+                var resp = await client.PostAsJsonAsync(fastPayUrl, fpPayload);
                 resp.EnsureSuccessStatusCode();
                 var fp = await resp.Content.ReadFromJsonAsync<FastPayResponse>();
                 return (true, fp?.id ?? string.Empty, fp?.status ?? "unknown");
             }
             else
             {
-                var resp = await client.PostAsJsonAsync(securePayUrl, request);
+                var spPayload = new
+                {
+                    amount_cents = (int)(request.amount * 100),
+                    currency_code = request.currency,
+                    client_reference = "ORD-20251022"
+                };
+
+                var resp = await client.PostAsJsonAsync(securePayUrl, spPayload);
                 resp.EnsureSuccessStatusCode();
                 var sp = await resp.Content.ReadFromJsonAsync<SecurePayResponse>();
                 return (true, sp?.transaction_id ?? string.Empty, sp?.result ?? "unknown");
@@ -100,7 +116,7 @@ app.MapPost("/payments", async (
     var fee = feeService.CalculateFee(request.amount, providerUsed);
     var net = request.amount - fee;
 
-    var canonical = new CanonicalResponse(externalId, providerUsed, status, request.amount, fee, net);
+    var canonical = new CanonicalResponse(new Random().Next(500), externalId, providerUsed, status, request.amount, fee, net);
     return Results.Ok(canonical);
 })
 .WithName("CreatePayment")
@@ -111,7 +127,7 @@ app.MapPost("/payments", async (
 .AddOpenApiOperationTransformer((operation, context, ct) =>
 {
     operation.Summary = "Create a payment";
-    operation.Description = "Business rules: if amount < 100 the provider used is FastPay, otherwise SecurePay. If the chosen provider is unavailable, the other provider is attempted regardless of the amount rule. Fees: 1.5% for amounts below 100, else 2.5%. The provider URLs are read from configuration keys FASTPAY_URL and SECUREPAY_URL.";
+    operation.Description = "Business rules: if amount < 100 the provider used is FastPay, otherwise SecurePay. If the chosen provider is unavailable, the other provider is attempted regardless of the amount rule.";
 
     return Task.CompletedTask;
 });
