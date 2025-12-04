@@ -10,12 +10,12 @@ O seguinte repositório contém uma solução .NET com uma API minimalista para 
 ## Requisitos
 - .NET 10 SDK
 
-## Endere�os locais (launchSettings)
+## Endereços locais (launchSettings)
 - `PayFlow.Api`: http://localhost:5175
 - `FastPay.Mock`: http://localhost:5114
 - `SecurePay.Mock`: http://localhost:5136
 
-## Configura��o
+## Configuração
 O projeto principal lê os endpoints dos provedores via configuração:
 - `FASTPAY_URL`
 - `SECUREPAY_URL`
@@ -25,7 +25,7 @@ O projeto principal lê os endpoints dos provedores via configuração:
 - Terminal 2: `dotnet run --project src/SecurePay.Mock`
 - Terminal 3: `dotnet run --project src/PayFlow.Api`
 
-## Swagger e documenta��o
+## Swagger e documentação
 Swagger habilitado em desenvolvimento:
 - UI: `http://localhost:5175/swagger`
 
@@ -41,7 +41,7 @@ Body:
 Regras de negócio:
 - Se `amount < 100`, o provedor utilizado o `FastPay`; caso contrário, `SecurePay`.
 - Caso o provedor principal utilizado na regra de valor não responda, a API deve tentar o outro provedor.
-- Taxas: 1.5% para valores abaixo de 100; 2.5% para valores a partir de 100.
+- Taxas: 3.49% para valores abaixo de 100; 2.99% + R$ 0.40 para valores a partir de 100.
 - URLs dos provedores são lidas de `FASTPAY_URL` e `SECUREPAY_URL`.
 
 Resposta (forma canonica):
@@ -61,7 +61,7 @@ Cdigos de status:
 - 400: Erro de validação (amount <= 0 ou currency em branco)
 - 502: Erro ao chamar o provedor
 
-## Servi�os Mock
+## Serviços Mock
 
 ### `FastPay.Mock`
 - Base URL: `http://localhost:5114`
