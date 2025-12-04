@@ -1,6 +1,6 @@
 # PayFlow Solution
 
-O seguinte repositório contém uma solução .NET com uma API minimalista para processamento de pagamentos, integrando-se a dois provedores simulados: FastPay e SecurePay. Visando atender as regras de negócio especificadas. Como detalharei a baixo foi incluido swagger para documentação e facilitação dos testes
+O seguinte repositÃ³rio contÃ©m uma soluÃ§Ã£o .NET com uma API minimalista para processamento de pagamentos, integrando-se a dois provedores simulados: FastPay e SecurePay. Visando atender as regras de negÃ³cio especificadas. Como detalharei a baixo foi incluido swagger para documentaÃ§Ã£o e facilitar os testes
 
 ## Projetos
 - `PayFlow.Api` (Minimal API)
@@ -10,13 +10,13 @@ O seguinte repositório contém uma solução .NET com uma API minimalista para proc
 ## Requisitos
 - .NET 10 SDK
 
-## Endereços locais (launchSettings)
+## Endereï¿½os locais (launchSettings)
 - `PayFlow.Api`: http://localhost:5175
 - `FastPay.Mock`: http://localhost:5114
 - `SecurePay.Mock`: http://localhost:5136
 
-## Configuração
-O projeto principal lê os endpoints dos provedores via configuração:
+## Configuraï¿½ï¿½o
+O projeto principal lÃª os endpoints dos provedores via configuraÃ§Ã£o:
 - `FASTPAY_URL`
 - `SECUREPAY_URL`
 
@@ -25,7 +25,7 @@ O projeto principal lê os endpoints dos provedores via configuração:
 - Terminal 2: `dotnet run --project src/SecurePay.Mock`
 - Terminal 3: `dotnet run --project src/PayFlow.Api`
 
-## Swagger e documentação
+## Swagger e documentaï¿½ï¿½o
 Swagger habilitado em desenvolvimento:
 - UI: `http://localhost:5175/swagger`
 
@@ -38,13 +38,13 @@ Body:
 }
 ```
 
-Regras de negócio:
-- Se `amount < 100`, o provedor utilizado é `FastPay`; caso contrário, `SecurePay`.
-- Caso o provedor principal utilizado na regra de valor não responda, a API deve tentar o outro provedor.
+Regras de negÃ³cio:
+- Se `amount < 100`, o provedor utilizado o `FastPay`; caso contrÃ¡rio, `SecurePay`.
+- Caso o provedor principal utilizado na regra de valor nÃ£o responda, a API deve tentar o outro provedor.
 - Taxas: 1.5% para valores abaixo de 100; 2.5% para valores a partir de 100.
-- URLs dos provedores são lidas de `FASTPAY_URL` e `SECUREPAY_URL`.
+- URLs dos provedores sÃ£o lidas de `FASTPAY_URL` e `SECUREPAY_URL`.
 
-Resposta (forma canônica):
+Resposta (forma canonica):
 ```
 {
   "externalId": "string",
@@ -56,12 +56,12 @@ Resposta (forma canônica):
 }
 ```
 
-Códigos de status:
+Cdigos de status:
 - 200: Sucesso
-- 400: Erro de validação (amount <= 0 ou currency em branco)
+- 400: Erro de validaÃ§Ã£o (amount <= 0 ou currency em branco)
 - 502: Erro ao chamar o provedor
 
-## Serviços Mock
+## Serviï¿½os Mock
 
 ### `FastPay.Mock`
 - Base URL: `http://localhost:5114`
@@ -86,14 +86,14 @@ Códigos de status:
 }
 ```
 
-## Testes rápidos
+## Testes rÃ¡pidos
 ```
 curl -X POST http://localhost:5175/payments \
   -H "Content-Type: application/json" \
   -d '{"amount": 50, "currency": "BRL"}'
 ```
 
-## Testes rápido de saúde da API
+## Testes rÃ¡pido de saÃºde da API
 ```
 curl -X GET http://localhost:5175/ 
 ```
@@ -101,3 +101,17 @@ curl -X GET http://localhost:5175/
 ```
 {"status":"ok","service":"PayFlow.Api"}
 ``` 
+
+## Para realizaÃ§Ã£o dos testes com docker-compose
+```
+docker-compose up --build
+```
+
+- A porta utilizada se torna a porta 5000
+
+```
+curl -X POST http://localhost:5000/payments \
+  -H "Content-Type: application/json" \
+  -d '{"amount": 50, "currency": "BRL"}'
+```
+

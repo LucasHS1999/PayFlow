@@ -6,7 +6,7 @@ services:
       dockerfile: src/PayFlow.Api/Dockerfile
     image: payflow-api:local
     ports:
-      - "5000:80"
+      - "5000:8080"
     environment:
       - FASTPAY_URL=http://fastpay-mock:80/fastpay/payments
       - SECUREPAY_URL=http://securepay-mock:80/securepay/transactions
